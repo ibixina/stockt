@@ -1,601 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Torn Stock Portfolio Tracker</title>
     <style>
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: #0d0d0d;
-    color: #e2e8f0;
-    line-height: 1.6;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1600px;
-    margin: 0 auto;
-    background: #1a1a1a;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    overflow: hidden;
-}
-
-.header {
-    background: #1a1a1a;
-    border-bottom: 1px solid #2d3748;
-    padding: 32px;
-    text-align: center;
-}
-
-.header h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #f7fafc;
-    margin-bottom: 8px;
-}
-
-.header p {
-    color: #a0aec0;
-    font-size: 1rem;
-}
-
-.content {
-    padding: 32px;
-}
-
-.api-section {
-    margin-bottom: 32px;
-}
-
-.input-group {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    align-items: center;
-}
-
-.input-group input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid #2d3748;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    background: #111;
-    color: #f7fafc;
-    transition: all 0.2s ease;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
-}
-
-.btn {
-    padding: 12px 24px;
-    background: #4299e1;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.btn:hover {
-    background: #3182ce;
-}
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.loading {
-    text-align: center;
-    padding: 32px;
-    color: #a0aec0;
-}
-
-.error {
-    background: #2d1f1f;
-    color: #f56565;
-    padding: 16px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    text-align: center;
-    border: 1px solid #742a2a;
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.stat-card {
-    background: #111;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    border: 1px solid #2d3748;
-    transition: all 0.2s ease;
-}
-
-.stat-card:hover {
-    border-color: #4299e1;
-    box-shadow: 0 0 10px rgba(66, 153, 225, 0.4);
-}
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #f7fafc;
-    word-break: break-all;
-    line-height: 1.2;
-}
-
-.stat-label {
-    color: #a0aec0;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-}
-
-.table-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid #2d3748;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #1a1a1a;
-    font-size: 0.875rem;
-    color: #e2e8f0;
-}
-
-th {
-    background: #2d3748;
-    color: #e2e8f0;
-    padding: 12px 8px;
-    text-align: left;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.75rem;
-    border-bottom: 1px solid #4a5568;
-    white-space: nowrap;
-}
-
-td {
-    padding: 12px 8px;
-    border-bottom: 1px solid #2d3748;
-    vertical-align: top;
-}
-
-tbody tr:hover {
-    background: #111;
-}
-
-.positive {
-    color: #48bb78;
-    font-weight: 500;
-}
-
-.negative {
-    color: #f56565;
-    font-weight: 500;
-}
-
-.stock-symbol {
-    font-weight: 600;
-    color: #edf2f7;
-    font-size: 0.9rem;
-}
-
-.stock-name {
-    font-size: 0.75rem;
-    color: #a0aec0;
-    margin-top: 2px;
-    line-height: 1.2;
-}
-
-.shares {
-    font-weight: 500;
-    color: #cbd5e0;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-}
-
-.price {
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    font-weight: 500;
-    white-space: nowrap;
-    color: #f7fafc;
-}
-
-.transaction-row {
-    background: #111;
-}
-
-.transaction-indent {
-    padding-left: 24px;
-    font-size: 0.8rem;
-    color: #a0aec0;
-}
-
-.transaction-date {
-    font-size: 0.75rem;
-    color: #718096;
-}
-
-@media (max-width: 768px) {
-    .content {
-        padding: 20px;
+    * {
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
     }
-    
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;
+      background:#0d0d0d;
+      color:#e2e8f0;
+      line-height:1.6;
+      min-height:100vh;
+      padding:20px;
+    }
+    .container {
+      max-width:1600px;
+      margin:0 auto;
+      background:#1a1a1a;
+      border-radius:12px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.6);
+      overflow:hidden;
+    }
     .header {
-        padding: 24px 20px;
+      background:#1a1a1a;
+      border-bottom:1px solid #2d3748;
+      padding:32px;
+      text-align:center;
     }
-    
     .header h1 {
-        font-size: 1.5rem;
+      font-size:2rem;
+      font-weight:600;
+      color:#f7fafc;
+      margin-bottom:8px;
     }
-    
+    .content {
+      padding:32px;
+    }
     .input-group {
-        flex-direction: column;
+      display:flex;
+      gap:12px;
+      margin-bottom:20px;
+      align-items:center;
     }
-    
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+    .input-group input {
+      flex:1;
+      padding:12px 16px;
+      border:1px solid #2d3748;
+      border-radius:6px;
+      font-size:0.95rem;
+      background:#111;
+      color:#f7fafc;
     }
-    
-    .stat-value {
-        font-size: 1.2rem;
+    .btn {
+      padding:12px 24px;
+      background:#4299e1;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:0.95rem;
+      font-weight:500;
     }
-    
-    th, td {
-        padding: 8px 4px;
-        font-size: 0.8rem;
+    .loading {
+      text-align:center;
+      padding:32px;
+      color:#a0aec0;
     }
-    
+    .error {
+      background:#2d1f1f;
+      color:#f56565;
+      padding:16px;
+      border-radius:6px;
+      margin-bottom:20px;
+      text-align:center;
+      border:1px solid #742a2a;
+    }
+    .table-container {
+      margin-top:30px;
+      overflow-x:auto;
+      border-radius:8px;
+      border:1px solid #2d3748;
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      background:#1a1a1a;
+      font-size:0.875rem;
+      color:#e2e8f0;
+    }
+    th {
+      background:#2d3748;
+      color:#e2e8f0;
+      padding:12px 8px;
+      text-align:left;
+      font-weight:600;
+      cursor:pointer;
+    }
+    td {
+      padding:12px 8px;
+      border-bottom:1px solid #2d3748;
+      vertical-align:top;
+    }
+    tbody tr:hover {
+      background:#111;
+    }
+    .positive {
+      color:#48bb78;
+      font-weight:500;
+    }
+    .negative {
+      color:#f56565;
+      font-weight:500;
+    }
+    .stock-symbol {
+      font-weight:600;
+      color:#edf2f7;
+      font-size:0.9rem;
+    }
     .stock-name {
-        display: none;
+      font-size:0.75rem;
+      color:#a0aec0;
+      margin-top:2px;
+      line-height:1.2;
     }
-}
-
-.empty-state {
-    text-align: center;
-    padding: 64px 20px;
-    color: #a0aec0;
-}
-
-.empty-state h3 {
-    font-size: 1.25rem;
-    margin-bottom: 8px;
-    color: #edf2f7;
-    font-weight: 600;
-}
-
-.summary-row {
-    background: #111;
-    border-top: 2px solid #2d3748;
-    font-weight: 500;
-}
-
-.summary-row td {
-    border-bottom: none;
-}
+    .shares,.price {
+      font-family:'SF Mono',Monaco,'Cascadia Code','Roboto Mono',Consolas,'Courier New',monospace;
+      font-weight:500;
+      white-space:nowrap;
+      color:#f7fafc;
+    }
+    h2 {
+      padding:10px;
+      background:#111;
+      border-bottom:1px solid #2d3748;
+    }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>hypatia</h1>
+      <div class="header">
+        <h1>hypatia</h1>
+      </div>
+      <div class="content">
+        <div class="input-group">
+          <input type="password" id="apiKey" placeholder="Enter your Torn API key" />
+          <button class="btn" onclick="loadPortfolio()">Load Portfolio</button>
         </div>
-        
-        <div class="content">
-            <div class="api-section">
-                <div class="input-group">
-                    <input type="password" id="apiKey" placeholder="Enter your Torn API key" />
-                    <button class="btn" onclick="loadPortfolio()">Load Portfolio</button>
-                </div>
-            </div>
-            
-            <div id="loading" class="loading" style="display: none;">
-                <div>Loading your portfolio...</div>
-            </div>
-            
-            <div id="error" class="error" style="display: none;"></div>
-            
-            <div id="stats" class="stats" style="display: none;"></div>
-            
-            <div id="tableContainer" class="table-container" style="display: none;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Stock</th>
-                            <th>Transaction</th>
-                            <th>Shares</th>
-                            <th>Bought Price</th>
-                            <th>Current Price</th>
-                            <th>Total Value</th>
-                            <th>P&L</th>
-                            <th>P&L %</th>
-                            <th>1H Change</th>
-                            <th>1D Change</th>
-                            <th>1W Change</th>
-                            <th>1M Change</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stockTableBody">
-                    </tbody>
-                </table>
-            </div>
-            
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <h3>All Clear!</h3>
-                <p>All your stock transactions are in perfect multiples of 1000 shares.</p>
-            </div>
+        <div id="loading" class="loading" style="display:none;">Loading data...</div>
+        <div id="error" class="error" style="display:none;"></div>
+        <div id="ownedContainer" class="table-container" style="display:none;">
+          <h2>Owned Stocks</h2>
+          <table id="ownedTable" data-sort-dir="asc">
+            <thead>
+              <tr>
+                <th onclick="sortTable('ownedTable',0)">Stock</th>
+                <th onclick="sortTable('ownedTable',1)">Transaction</th>
+                <th onclick="sortTable('ownedTable',2)">Shares</th>
+                <th onclick="sortTable('ownedTable',3)">Bought Price</th>
+                <th onclick="sortTable('ownedTable',4)">Current Price</th>
+                <th onclick="sortTable('ownedTable',5)">Total Value</th>
+                <th onclick="sortTable('ownedTable',6)">P&L</th>
+                <th onclick="sortTable('ownedTable',7)">P&L %</th>
+                <th onclick="sortTable('ownedTable',8)">1H</th>
+                <th onclick="sortTable('ownedTable',9)">1D</th>
+                <th onclick="sortTable('ownedTable',10)">1W</th>
+                <th onclick="sortTable('ownedTable',11)">1M</th>
+              </tr>
+            </thead>
+            <tbody id="ownedTableBody"></tbody>
+          </table>
         </div>
+        <div id="allContainer" class="table-container" style="display:none;">
+          <h2>All Stocks</h2>
+          <table id="allTable" data-sort-dir="asc">
+            <thead>
+              <tr>
+                <th onclick="sortTable('allTable',0)">Stock</th>
+                <th onclick="sortTable('allTable',1)">Transaction</th>
+                <th onclick="sortTable('allTable',2)">Total Shares</th>
+                <th onclick="sortTable('allTable',3)">Avg Price</th>
+                <th onclick="sortTable('allTable',4)">Current Price</th>
+                <th onclick="sortTable('allTable',5)">Market Cap</th>
+                <th onclick="sortTable('allTable',6)">Investors</th>
+                <th onclick="sortTable('allTable',7)">Per Investor Value</th>
+                <th onclick="sortTable('allTable',8)">1H</th>
+                <th onclick="sortTable('allTable',9)">1D</th>
+                <th onclick="sortTable('allTable',10)">1W</th>
+                <th onclick="sortTable('allTable',11)">1M</th>
+              </tr>
+            </thead>
+            <tbody id="allTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
-
     <script>
-        let apiKey = '';
-        
-        // Load API key from localStorage if available
-        window.addEventListener('load', () => {
-            const savedKey = localStorage.getItem('tornApiKey');
-            if (savedKey) {
-                document.getElementById('apiKey').value = savedKey;
+    let apiKey = '';
+    window.addEventListener('load',()=>{const saved=localStorage.getItem('tornApiKey'); if(saved){document.getElementById('apiKey').value=saved;}});
+    function showLoading(b){document.getElementById('loading').style.display=b?'block':'none';}
+    function showError(m){const e=document.getElementById('error'); e.textContent=m; e.style.display='block';}
+    function hideError(){document.getElementById('error').style.display='none';}
+    function formatNumber(n){return new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
+    function formatCurrency(n){return '$'+formatNumber(n);}
+    function formatPercent(n){const c=n>=0?'positive':'negative'; const s=n>=0?'+':''; return `<span class="${c}">${s}${formatNumber(n)}%</span>`;}
+    function formatDate(ts){return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});}
+    function sortTable(id,col){const t=document.getElementById(id);const rows=Array.from(t.tBodies[0].rows);const asc=t.getAttribute('data-sort-dir')!=='asc';rows.sort((a,b)=>{const A=a.cells[col].innerText.replace(/[$,%]/g,'');const B=b.cells[col].innerText.replace(/[$,%]/g,'');return asc?(parseFloat(A)-parseFloat(B)):(parseFloat(B)-parseFloat(A));});rows.forEach(r=>t.tBodies[0].appendChild(r));t.setAttribute('data-sort-dir',asc?'asc':'desc');}
+
+    async function loadPortfolio(){
+      apiKey=document.getElementById('apiKey').value.trim();
+      if(!apiKey){showError('Enter API key');return;}
+      localStorage.setItem('tornApiKey',apiKey);
+      hideError(); showLoading(true);
+      document.getElementById('ownedContainer').style.display='none';
+      document.getElementById('allContainer').style.display='none';
+
+      try{
+        const userResp=await fetch(`https://api.torn.com/user/?selections=stocks&key=${apiKey}`);
+        const userData=await userResp.json();
+        if(userData.error) throw new Error(userData.error.error);
+
+        const allResp=await fetch(`https://api.torn.com/torn/?selections=stocks&key=${apiKey}`);
+        const allData=await allResp.json();
+
+        const ownedRows=[];
+        for(const stock of Object.values(userData.stocks||{})){
+          for(const tx of Object.values(stock.transactions||{})){
+            if(tx.shares % 1000 !== 0){
+              const sResp=await fetch(`https://api.torn.com/torn/${stock.stock_id}?selections=stocks&key=${apiKey}`);
+              const sData=await sResp.json();
+              const sd=sData.stocks[stock.stock_id];
+              const cur=sd.current_price; const val=tx.shares*cur; const cost=tx.shares*tx.bought_price; const pl=val-cost; const plp=((cur-tx.bought_price)/tx.bought_price)*100;
+              ownedRows.push(`<tr>
+<td><div class="stock-symbol">${sd.acronym}</div><div class="stock-name">${sd.name}</div></td>
+<td>${formatDate(tx.time_bought)}</td>
+<td class="shares">${tx.shares}</td>
+<td class="price">${formatCurrency(tx.bought_price)}</td>
+<td class="price">${formatCurrency(cur)}</td>
+<td class="price">${formatCurrency(val)}</td>
+<td class="${pl>=0?'positive':'negative'}">${formatCurrency(pl)}</td>
+<td>${formatPercent(plp)}</td>
+<td>${sd.last_hour?formatPercent(sd.last_hour.change_percentage):'N/A'}</td>
+<td>${sd.last_day?formatPercent(sd.last_day.change_percentage):'N/A'}</td>
+<td>${sd.last_week?formatPercent(sd.last_week.change_percentage):'N/A'}</td>
+<td>${sd.last_month?formatPercent(sd.last_month.change_percentage):'N/A'}</td>
+</tr>`);
             }
-        });
-        
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
+          }
         }
-        
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
+        document.getElementById('ownedTableBody').innerHTML=ownedRows.join('');
+        if(ownedRows.length) document.getElementById('ownedContainer').style.display='block';
+
+        const allRows=[];
+        for(const [id,sd] of Object.entries(allData.stocks||{})){
+          const sResp=await fetch(`https://api.torn.com/torn/${id}?selections=stocks&key=${apiKey}`);
+          const sData=await sResp.json();
+          const d=sData.stocks[id];
+
+          const avgPrice = d.market_cap && d.total_shares ? d.market_cap / d.total_shares : 0;
+          const perInvestor = d.market_cap && d.investors ? d.market_cap / d.investors : 0;
+
+          allRows.push(`<tr>
+<td><div class="stock-symbol">${d.acronym}</div><div class="stock-name">${d.name}</div></td>
+<td>Market</td>
+<td class="shares">${d.total_shares.toLocaleString()}</td>
+<td class="price">${formatCurrency(avgPrice)}</td>
+<td class="price">${formatCurrency(d.current_price)}</td>
+<td class="price">${formatCurrency(d.market_cap)}</td>
+<td class="shares">${d.investors.toLocaleString()}</td>
+<td class="price">${formatCurrency(perInvestor)}</td>
+<td>${d.last_hour?formatPercent(d.last_hour.change_percentage):'N/A'}</td>
+<td>${d.last_day?formatPercent(d.last_day.change_percentage):'N/A'}</td>
+<td>${d.last_week?formatPercent(d.last_week.change_percentage):'N/A'}</td>
+<td>${d.last_month?formatPercent(d.last_month.change_percentage):'N/A'}</td>
+</tr>`);
         }
-        
-        function hideError() {
-            document.getElementById('error').style.display = 'none';
-        }
-        
-        function formatNumber(num) {
-            return new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(num);
-        }
-        
-        function formatCurrency(num) {
-            return '$' + new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(num);
-        }
-        
-        function formatPercent(num) {
-            const className = num >= 0 ? 'positive' : 'negative';
-            const sign = num >= 0 ? '+' : '';
-            return `<span class="${className}">${sign}${formatNumber(num)}%</span>`;
-        }
-        
-        function formatChange(num) {
-            const className = num >= 0 ? 'positive' : 'negative';
-            const sign = num >= 0 ? '+' : '';
-            return `<span class="${className}">${sign}${formatNumber(num)}</span>`;
-        }
-        
-        function formatDate(timestamp) {
-            return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: '2-digit'
-            });
-        }
-        
-        async function loadPortfolio() {
-            apiKey = document.getElementById('apiKey').value.trim();
-            
-            if (!apiKey) {
-                showError('Please enter your API key');
-                return;
-            }
-            
-            // Save API key to localStorage
-            localStorage.setItem('tornApiKey', apiKey);
-            
-            hideError();
-            showLoading(true);
-            document.getElementById('stats').style.display = 'none';
-            document.getElementById('tableContainer').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-            
-            try {
-                // Get user stocks
-                const userResponse = await fetch(`https://api.torn.com/user/?selections=stocks&key=${apiKey}&comment=PortfolioTracker`);
-                const userData = await userResponse.json();
-                
-                if (userData.error) {
-                    throw new Error(userData.error.error);
-                }
-                
-                // Find all transactions where shares are not divisible by 1000
-                const oddTransactions = [];
-                
-                Object.values(userData.stocks).forEach(stock => {
-                    Object.values(stock.transactions).forEach(transaction => {
-                        if (transaction.shares % 1000 !== 0) {
-                            oddTransactions.push({
-                                stockId: stock.stock_id,
-                                stock: stock,
-                                transaction: transaction
-                            });
-                        }
-                    });
-                });
-                
-                if (oddTransactions.length === 0) {
-                    showLoading(false);
-                    document.getElementById('emptyState').style.display = 'block';
-                    return;
-                }
-                
-                // Get current prices for stocks with odd transactions
-                const stockIds = [...new Set(oddTransactions.map(t => t.stockId))];
-                const pricePromises = stockIds.map(id => 
-                    fetch(`https://api.torn.com/torn/${id}?selections=stocks&key=${apiKey}`)
-                        .then(response => response.json())
-                );
-                
-                const priceData = await Promise.all(pricePromises);
-                
-                // Create lookup for current stock data
-                const currentPrices = {};
-                priceData.forEach(data => {
-                    if (data.stocks) {
-                        Object.entries(data.stocks).forEach(([id, stockData]) => {
-                            currentPrices[id] = stockData;
-                        });
-                    }
-                });
-                
-                // Enrich transactions with current price data
-                const enrichedTransactions = oddTransactions.map(t => ({
-                    ...t,
-                    currentData: currentPrices[t.stockId]
-                })).filter(t => t.currentData);
-                
-                displayStats(enrichedTransactions);
-                displayTable(enrichedTransactions);
-                showLoading(false);
-                
-            } catch (error) {
-                showLoading(false);
-                showError(`Error loading portfolio: ${error.message}`);
-            }
-        }
-        
-        function displayStats(transactions) {
-            let totalInvested = 0;
-            let totalCurrentValue = 0;
-            
-            transactions.forEach(t => {
-                const shares = t.transaction.shares;
-                const boughtPrice = t.transaction.bought_price;
-                const currentPrice = t.currentData.current_price;
-                
-                totalInvested += shares * boughtPrice;
-                totalCurrentValue += shares * currentPrice;
-            });
-            
-            const totalPL = totalCurrentValue - totalInvested;
-            const totalPLPercent = ((totalCurrentValue - totalInvested) / totalInvested) * 100;
-            
-            const statsHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${transactions.length}</div>
-                    <div class="stat-label">Odd Transactions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${formatCurrency(totalInvested)}</div>
-                    <div class="stat-label">Total Invested</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${formatCurrency(totalCurrentValue)}</div>
-                    <div class="stat-label">Current Value</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value ${totalPL >= 0 ? 'positive' : 'negative'}">${formatCurrency(totalPL)}</div>
-                    <div class="stat-label">Total P&L</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value ${totalPLPercent >= 0 ? 'positive' : 'negative'}">${formatNumber(totalPLPercent)}%</div>
-                    <div class="stat-label">Total P&L %</div>
-                </div>
-            `;
-            
-            document.getElementById('stats').innerHTML = statsHTML;
-            document.getElementById('stats').style.display = 'grid';
-        }
-        
-        function displayTable(transactions) {
-            const tbody = document.getElementById('stockTableBody');
-            tbody.innerHTML = '';
-            
-            // Sort by P&L percentage descending
-            transactions.sort((a, b) => {
-                const getPL = (t) => {
-                    const current = t.currentData.current_price;
-                    const bought = t.transaction.bought_price;
-                    return ((current - bought) / bought) * 100;
-                };
-                return getPL(b) - getPL(a);
-            });
-            
-            transactions.forEach(t => {
-                const shares = t.transaction.shares;
-                const boughtPrice = t.transaction.bought_price;
-                const currentPrice = t.currentData.current_price;
-                const totalValue = shares * currentPrice;
-                const totalCost = shares * boughtPrice;
-                const profitLoss = totalValue - totalCost;
-                const profitLossPercent = ((currentPrice - boughtPrice) / boughtPrice) * 100;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div class="stock-symbol">${t.currentData.acronym}</div>
-                        <div class="stock-name">${t.currentData.name}</div>
-                    </td>
-                    <td>
-                        <div class="transaction-date">${formatDate(t.transaction.time_bought)}</div>
-                    </td>
-                    <td class="shares">${shares.toLocaleString()}</td>
-                    <td class="price">$${formatNumber(boughtPrice)}</td>
-                    <td class="price">$${formatNumber(currentPrice)}</td>
-                    <td class="price">${formatCurrency(totalValue)}</td>
-                    <td class="${profitLoss >= 0 ? 'positive' : 'negative'}">${formatCurrency(profitLoss)}</td>
-                    <td>${formatPercent(profitLossPercent)}</td>
-                    <td>${t.currentData.last_hour ? formatPercent(t.currentData.last_hour.change_percentage) : 'N/A'}</td>
-                    <td>${t.currentData.last_day ? formatPercent(t.currentData.last_day.change_percentage) : 'N/A'}</td>
-                    <td>${t.currentData.last_week ? formatPercent(t.currentData.last_week.change_percentage) : 'N/A'}</td>
-                    <td>${t.currentData.last_month ? formatPercent(t.currentData.last_month.change_percentage) : 'N/A'}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            document.getElementById('tableContainer').style.display = 'block';
-        }
-        
-        // Allow Enter key to trigger load
-        document.getElementById('apiKey').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loadPortfolio();
-            }
-        });
+
+        document.getElementById('allTableBody').innerHTML=allRows.join('');
+        document.getElementById('allContainer').style.display='block';
+        showLoading(false);
+      }catch(e){showLoading(false);showError(e.message);}
+    }
+    document.getElementById('apiKey').addEventListener('keypress',e=>{if(e.key==='Enter'){loadPortfolio();}});
     </script>
-</body>
+  </body>
 </html>
